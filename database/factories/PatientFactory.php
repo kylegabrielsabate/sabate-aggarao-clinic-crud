@@ -1,23 +1,20 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Factories;
 
-use Illuminate\Database\Seeder;
-use App\Models\Patient;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PatientSeeder extends Seeder
+class PatientFactory extends Factory
 {
-    public function run(): void
+    public function definition(): array
     {
-        // Create 20 patients using the factory
-        Patient::factory()
-            ->count(20)
-            // The sequence method gives us an index starting at 0
-            ->sequence(fn ($sequence) => [
-                // $sequence->index goes 0, 1, 2... 19
-                // So 1001 + 0 = 1001, 1001 + 19 = 1020
-                'id_number' => 'PT-' . str_pad(1001 + $sequence->index, 4, '0', STR_PAD_LEFT)
-            ])
-            ->create();
+        return [
+            // 'patient_no' is handled by the seeder below
+            'first_name'     => $this->faker->firstName(),
+            'last_name'      => $this->faker->lastName(),
+            'birth_date'     => $this->faker->date('Y-m-d', '2005-01-01'), // Generates a random date before 2005
+            'sex'            => $this->faker->randomElement(['Male', 'Female']),
+            'contact_number' => $this->faker->numerify('09#########'), // Generates PH mobile format
+        ];
     }
 }

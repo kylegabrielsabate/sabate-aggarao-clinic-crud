@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Patient;
+use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
 
 class PatientSeeder extends Seeder
@@ -11,30 +11,31 @@ class PatientSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create();
+        $patientsToInsert = [];
 
-        // Loop 20 times to create 20 patients
+        // Loop 20 times to prepare 20 patients
         for ($i = 1; $i <= 20; $i++) {
             
-            // Generates: PT-1001, PT-1002, ... up to PT-1020
-            // (Note: If you meant PT-101 to PT-120, change '1000 + $i' to '100 + $i')
-            $patientId = 'PT-' . str_pad(1000 + $i, 4, '0', STR_PAD_LEFT); 
+            // Generates: PT-101, PT-102, ... up to PT-120
+            $patientId = 'PT-' . str_pad(100 + $i, 3, '0', STR_PAD_LEFT);
 
-            Patient::create([
-                // ⚠️ CRITICAL: Change these left-side names to match your EXACT migration column names!
-                // Common alternatives: 'patient_id' instead of 'id_number', 'contact' instead of 'phone'
-                
-                'id_number'   => $patientId, 
-                'first_name'  => $faker->firstName(),
-                'last_name'   => $faker->lastName(),
-                'age'         => $faker->numberBetween(18, 80),
-                'gender'      => $faker->randomElement(['Male', 'Female', 'Prefer not to say']),
-                'address'     => $faker->address(),
-                'phone'       => $faker->phoneNumber(),
-                'email'       => $faker->unique()->safeEmail(), // Added as it's common in clinics
-                
-                // Add any other required columns from your migration here 
-                // e.g., 'date_of_birth' => $faker->date(),
-            ]);
+            $patientsToInsert[] = [
+                // ✅ FIXED: Changed to 'patient_number' to match your actual database column!
+                'patient_number' => $patientId,
+                'first_name'     => $faker->firstName(),
+                'last_name'      => $faker->lastName(),
+                'birth_date'     => $faker->date('Y-m-d', '2005-01-01'),
+                'sex'            => $faker->randomElement(['Male', 'Female']),
+                'contact_number' => $faker->numerify('09#########'),
+                'address'        => $faker->address(),
+                'created_at'     => now(),
+                'updated_at'     => now(),
+            ];
         }
+
+        // Insert all 20 directly into the database
+        DB::table('patients')->insert($patientsToInsert);
+        
+        $this->command->info('✅ Successfully inserted 20 patients!');
     }
 }
